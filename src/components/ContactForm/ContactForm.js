@@ -4,19 +4,33 @@ import './ContactForm.css';
 const ContactForm = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('General Inquiry');
   const [message, setMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubjectChange = (e) => {
+    setSubject(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
-    if (name && email && message) {
-      // Here you can implement the functionality to send the contact form data
-      console.log('Form submitted:', name, email, message);
-      setIsSubmitted(true);
-    } else {
-      alert('Please fill in all fields.');
+    try {
+      const response = await fetch('YOUR_SERVER_ENDPOINT', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email, subject, message })
+      });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+      } else {
+        console.error('Error submitting the form');
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -41,6 +55,11 @@ const ContactForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <select value={subject} onChange={handleSubjectChange}>
+            <option value="General Inquiry">General Inquiry</option>
+            <option value="Services">Services</option>
+            <option value="Feedback">Feedback</option>
+          </select>
           <textarea
             placeholder="Your Message"
             value={message}
